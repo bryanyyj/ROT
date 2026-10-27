@@ -2,9 +2,15 @@
 
 Every behaviour claim references an `EV-###` id here. Evidence is a **public source** or a
 **published scientific method** — never decompilation output. A rule with no evidence id is marked
-`UNKNOWN`/assumption.
+`UNKNOWN`/assumption. All entries are `Static` (from public reading); none are runtime-captured from
+any third-party app.
 
-| ID | Source (public URL / reference) | Topic | Observation | Date |
+| ID | Source (public) | Topic | Observation | Date |
 |---|---|---|---|---|
-
-_Pending — populated in Phase 1._
+| EV-001 | [the5krunner](https://the5krunner.com/2026/09/20/restortrain-ai-training-app/) · [App Store](https://apps.apple.com/us/app/restortrain/id6752621455) · [restortrain.com/faq](https://restortrain.com/faq) | Category framing | A training-readiness app analyses HRV, sleep, resting HR and training load and recommends **train hard / go easy / rest**, integrating with Garmin/Apple Health/COROS/etc. Establishes the *category*; no proprietary logic copied. | 2026-10-27 |
+| EV-002 | [TrainingPeaks — Science of the Performance Manager](https://www.trainingpeaks.com/learn/articles/the-science-of-the-performance-manager/) · [FasCat](https://fascatcoaching.com/blogs/training-tips/performance-manager-chart/) | CTL/ATL/TSB | Fitness **CTL** = EWMA of daily load, 42-day time constant; Fatigue **ATL** = EWMA, 7-day; Form **TSB** = CTL − ATL. Recursive form: `X_today = X_yday + (load_today − X_yday)/τ`. | 2026-10-27 |
+| EV-003 | [Gabbett, BJSM 2016 (training-injury paradox)](https://pubmed.ncbi.nlm.nih.gov/26758673/) · [ACWR systematic review (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC12487117/) | ACWR | Acute:chronic workload ratio "sweet spot" ≈ **0.8–1.3**; injury risk rises markedly above ~**1.5**. Acute = ~7-day load, chronic = ~28-day load. | 2026-10-27 |
+| EV-004 | [TrainingPeaks — Performance Manager (TSS/TRIMP basis)](https://www.trainingpeaks.com/learn/articles/the-science-of-the-performance-manager/) · Banister TRIMP (impulse-response model) | Per-session load | Daily training load can be quantified as duration × intensity (TSS-style) or HR-based TRIMP, giving a single number that feeds CTL/ATL. | 2026-10-27 |
+| EV-005 | [HRV-Guided Training guide](https://www.athletedata.health/guides/hrv-guided-training) · [TrainingPeaks HRV evidence](https://www.trainingpeaks.com/coach-blog/new-study-widens-hrv-evidence-for-more-athletes/) · [baseline/SWC methodology](https://github.com/airbone42/360-data-athlete/blob/main/research/hrv-rhr-baseline-methodology.md) | HRV readiness | rMSSD (ln-transformed) is the preferred metric. Compare today's value to a **7-day rolling mean** against a longer (~60-day) baseline; the **Smallest Worthwhile Change (SWC) ≈ 0.5 × within-athlete SD** defines the noise band. Below the band → parasympathetic suppression → bias toward rest. | 2026-10-27 |
+| EV-006 | [baseline/SWC methodology (RHR)](https://github.com/airbone42/360-data-athlete/blob/main/research/hrv-rhr-baseline-methodology.md) | Resting HR | Resting HR **elevated** vs. personal baseline is a recognised marker of accumulated fatigue, under-recovery or illness → bias toward rest. | 2026-10-27 |
+| EV-007 | General sports-science wellness monitoring (subjective wellness questionnaires; Hooper index) | Sleep & subjective | Short/poor **sleep** and high **soreness/fatigue/stress** (simple daily self-report) are established recovery markers and predict reduced readiness. | 2026-10-27 |
