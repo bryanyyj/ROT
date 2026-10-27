@@ -10,7 +10,16 @@ An **original** training-readiness app: given your recovery and training-load da
 
 ## Status
 
-Early scaffold. Work proceeds in phases with owner checkpoints — see [`docs/`](docs/).
+**MVP working.** Pure decision engine (`@rot/engine`, 22 tests) + a React daily check-in UI
+(working name **ReadyOrRest**) with local persistence. Work proceeds in phases with owner checkpoints —
+see [`docs/`](docs/).
+
+## Calibrate against your own data (legal)
+
+The engine's weights/thresholds are literature-grounded defaults, not any app's actual values. To tune
+and validate them, record your **own** observed input→recommendation pairs from RestOrTrain (your own
+account) in [`evidence/owner-observations.json`](evidence/owner-observations.json); `npm test` then
+reports a match rate. See [`docs/00-scope.md`](docs/00-scope.md) for why this is legal.
 
 ## Project layout
 
