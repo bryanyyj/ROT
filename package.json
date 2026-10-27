@@ -1,0 +1,17 @@
+{
+  "name": "rot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "An original 'rest or train' training-readiness app (clean-room, built from public sports-science methods).",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "npm run test --workspace packages/engine",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "dev": "npm run dev --workspace apps/web"
+  }
+}
