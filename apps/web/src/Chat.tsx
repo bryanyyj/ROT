@@ -15,6 +15,7 @@ export function Chat() {
   const [busy, setBusy] = useState(false);
   const [llmReady, setLlmReady] = useState<boolean | null>(null);
   const [model, setModel] = useState("");
+  const [free, setFree] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
 
@@ -23,6 +24,7 @@ export function Chat() {
       .then((s) => {
         setLlmReady(s.openRouter.configured);
         setModel(s.openRouter.model);
+        setFree(!!s.openRouter.free);
       })
       .catch(() => setLlmReady(false));
   }, []);
@@ -134,7 +136,9 @@ export function Chat() {
             <SendIcon />
           </button>
         </div>
-        {model && llmReady && <span className="composer-model">{model}</span>}
+        {model && llmReady && (
+          <span className="composer-model">{model}{free ? " · free" : ""}</span>
+        )}
       </div>
     </div>
   );

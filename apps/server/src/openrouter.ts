@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { config } from "./config.js";
+import { config, assertNoCost } from "./config.js";
 
 /** OpenAI-compatible client pointed at OpenRouter. */
 export function makeClient(): OpenAI {
@@ -20,12 +20,14 @@ export interface LlmMessage {
 
 /** Stream a completion, yielding text deltas. Throws on API error. */
 export async function* streamChat(messages: LlmMessage[]): AsyncGenerator<string> {
+  assertNoCost();
   const client = makeClient();
   const stream = await client.chat.completions.create({
     model: config.openRouter.model,
     messages,
     stream: true,
     temperature: 0.4,
+    max_tokens: config.openRouter.maxTokens,
   });
   for await (const chunk of stream) {
     const delta = chunk.choices[0]?.delta?.content;
@@ -35,11 +37,13 @@ export async function* streamChat(messages: LlmMessage[]): AsyncGenerator<string
 
 /** Non-streaming completion (used for the weekly plan). */
 export async function completeChat(messages: LlmMessage[]): Promise<string> {
+  assertNoCost();
   const client = makeClient();
   const res = await client.chat.completions.create({
     model: config.openRouter.model,
     messages,
     temperature: 0.4,
+    max_tokens: config.openRouter.maxTokens,
   });
   return res.choices[0]?.message?.content ?? "";
 }

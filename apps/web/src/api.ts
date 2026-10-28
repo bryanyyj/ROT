@@ -1,7 +1,7 @@
 import type { ReadinessResult } from "@rot/engine";
 
 export interface Status {
-  openRouter: { configured: boolean; model: string };
+  openRouter: { configured: boolean; model: string; free?: boolean; freeOnly?: boolean };
   strava: { configured: boolean; connected: boolean };
   garmin: { available: boolean; reason: string };
   source: string;

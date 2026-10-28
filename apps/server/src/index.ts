@@ -1,5 +1,5 @@
 import express from "express";
-import { config, hasOpenRouter, hasStrava } from "./config.js";
+import { config, hasOpenRouter, hasStrava, isFreeModel } from "./config.js";
 import { store } from "./store.js";
 import {
   buildContext,
@@ -30,7 +30,12 @@ app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
 app.get("/api/status", (_req, res) => {
   res.json({
-    openRouter: { configured: hasOpenRouter(), model: config.openRouter.model },
+    openRouter: {
+      configured: hasOpenRouter(),
+      model: config.openRouter.model,
+      free: isFreeModel(),
+      freeOnly: config.openRouter.freeOnly,
+    },
     strava: { configured: hasStrava(), connected: !!store.getStrava() },
     garmin: GARMIN_STATUS,
     source: store.getSource(),
