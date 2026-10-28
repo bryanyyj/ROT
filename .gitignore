@@ -31,3 +31,6 @@ coverage/
 
 # Server runtime data (tokens, cached activities)
 apps/server/data/
+
+# Local agent context brief (hand-off to other AI agents; keep local)
+docs/AGENT-CONTEXT.md
