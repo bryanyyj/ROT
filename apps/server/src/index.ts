@@ -1,7 +1,14 @@
 import express from "express";
 import { config, hasOpenRouter, hasStrava } from "./config.js";
 import { store } from "./store.js";
-import { buildContext, contextMessage, COACH_SYSTEM, WEEKLY_PLAN_PROMPT } from "./coach.js";
+import {
+  buildContext,
+  contextMessage,
+  planWeek,
+  pastSessions,
+  COACH_SYSTEM,
+  WEEKLY_PLAN_PROMPT,
+} from "./coach.js";
 import { streamChat, completeChat, type LlmMessage } from "./openrouter.js";
 import { authorizeUrl, exchangeCode, syncActivities } from "./strava.js";
 import { GARMIN_STATUS } from "./garmin.js";
@@ -39,6 +46,17 @@ app.get("/api/context", (_req, res) => {
     weekLoad: ctx.weekLoad,
     source: store.getSource(),
     totalActivities: ctx.totalActivities,
+  });
+});
+
+app.get("/api/week", (_req, res) => {
+  const activities = store.getActivities();
+  const ctx = buildContext(activities, store.getWellness());
+  res.json({
+    planned: planWeek(ctx, activities),
+    past: pastSessions(activities),
+    readiness: ctx.readiness,
+    source: store.getSource(),
   });
 });
 

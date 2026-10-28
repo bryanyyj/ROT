@@ -32,3 +32,25 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
 }
+
+export type Intensity = "rest" | "easy" | "tempo" | "threshold" | "vo2" | "long";
+
+/** A planned (future) training session on the calendar. */
+export interface PlannedSession {
+  date: string; // YYYY-MM-DD
+  sport: string; // Ride | Run | Swim
+  title: string;
+  intensity: Intensity;
+  durationMin: number;
+  rationale: string;
+}
+
+/** A completed (past) session, summarised for the calendar. */
+export interface CompletedSession {
+  date: string;
+  sport: string;
+  title: string;
+  durationMin: number;
+  distanceKm?: number;
+  load: number;
+}

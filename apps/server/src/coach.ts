@@ -1,5 +1,11 @@
 import { recommend, type ReadinessInput, type ReadinessResult } from "@rot/engine";
-import type { Activity, Wellness } from "./types.js";
+import type {
+  Activity,
+  CompletedSession,
+  Intensity,
+  PlannedSession,
+  Wellness,
+} from "./types.js";
 
 /** Rough per-activity training load when the source didn't provide one. */
 export function estimateLoad(a: Activity): number {
@@ -96,6 +102,99 @@ Rules:
 
 export function contextMessage(ctx: CoachContext): string {
   return `ATHLETE DATA:\n${formatContextBlock(ctx)}`;
+}
+
+// ---- Structured weekly plan (deterministic, engine-grounded) ----
+
+const INTENSITY_MIN: Record<Intensity, number> = {
+  rest: 0,
+  easy: 45,
+  tempo: 60,
+  threshold: 75,
+  vo2: 60,
+  long: 150,
+};
+
+const INTENSITY_RATIONALE: Record<Intensity, string> = {
+  rest: "Recovery day — let fitness absorb.",
+  easy: "Aerobic base, keep it conversational.",
+  tempo: "Sustained moderate effort.",
+  threshold: "Work at/near threshold to lift fitness.",
+  vo2: "Short hard intervals for top-end.",
+  long: "Long endurance session for aerobic volume.",
+};
+
+function dominantSport(activities: Activity[]): string {
+  const counts = new Map<string, number>();
+  for (const a of activities) counts.set(a.type, (counts.get(a.type) ?? 0) + 1);
+  let best = "Ride";
+  let max = 0;
+  for (const [sport, n] of counts) if (n > max) ((max = n), (best = sport));
+  return best;
+}
+
+function isoPlus(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+/** 7-day microcycle from today, shaped by the engine verdict and ACWR. */
+export function planWeek(ctx: CoachContext, activities: Activity[]): PlannedSession[] {
+  const sport = dominantSport(activities);
+  const acwr = ctx.readiness.metrics.acwr ?? 1;
+  const deload = acwr >= 1.3 || ctx.readiness.recommendation === "REST";
+
+  const template: Intensity[] = deload
+    ? ["easy", "rest", "easy", "tempo", "rest", "long", "easy"]
+    : ["threshold", "easy", "rest", "tempo", "easy", "long", "easy"];
+
+  // Today is driven by the engine's live verdict.
+  template[0] =
+    ctx.readiness.recommendation === "REST"
+      ? "rest"
+      : ctx.readiness.recommendation === "TRAIN_EASY"
+        ? "easy"
+        : template[0]!;
+
+  return template.map((intensity, i) => {
+    const title =
+      intensity === "rest"
+        ? "Rest"
+        : `${intensity[0]!.toUpperCase()}${intensity.slice(1)} ${sport.toLowerCase()}`;
+    const rationale =
+      i === 0 && intensity !== "rest"
+        ? `${INTENSITY_RATIONALE[intensity]} (engine: ${ctx.readiness.recommendation}).`
+        : i === 0
+          ? `${INTENSITY_RATIONALE[intensity]} (engine says rest today).`
+          : INTENSITY_RATIONALE[intensity];
+    return {
+      date: isoPlus(i),
+      sport: intensity === "rest" ? sport : sport,
+      title,
+      intensity,
+      durationMin: INTENSITY_MIN[intensity],
+      rationale,
+    };
+  });
+}
+
+/** Recent completed sessions for the calendar (most recent first). */
+export function pastSessions(activities: Activity[], limit = 21): CompletedSession[] {
+  return [...activities]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, limit)
+    .map((a) => {
+      const s: CompletedSession = {
+        date: a.date,
+        sport: a.type,
+        title: a.name ?? a.type,
+        durationMin: a.durationMin,
+        load: estimateLoad(a),
+      };
+      if (a.distanceKm !== undefined) s.distanceKm = a.distanceKm;
+      return s;
+    });
 }
 
 export const WEEKLY_PLAN_PROMPT = `Using the athlete data, produce a 7-day training plan starting today.

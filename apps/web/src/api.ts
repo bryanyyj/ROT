@@ -32,6 +32,38 @@ export interface ChatMessage {
   content: string;
 }
 
+export type Intensity = "rest" | "easy" | "tempo" | "threshold" | "vo2" | "long";
+
+export interface PlannedSession {
+  date: string;
+  sport: string;
+  title: string;
+  intensity: Intensity;
+  durationMin: number;
+  rationale: string;
+}
+
+export interface CompletedSession {
+  date: string;
+  sport: string;
+  title: string;
+  durationMin: number;
+  distanceKm?: number;
+  load: number;
+}
+
+export interface WeekData {
+  planned: PlannedSession[];
+  past: CompletedSession[];
+  readiness: ReadinessResult;
+  source: string;
+}
+
+export async function getWeek(): Promise<WeekData> {
+  const r = await fetch("/api/week");
+  return r.json();
+}
+
 export async function getStatus(): Promise<Status> {
   const r = await fetch("/api/status");
   return r.json();

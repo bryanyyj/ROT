@@ -1,39 +1,41 @@
-import { useState } from "react";
-import { Coach } from "./Coach.js";
-import { CheckIn } from "./CheckIn.js";
+import { useState, type ComponentType } from "react";
+import { Chat } from "./Chat.js";
+import { Calendar } from "./Calendar.js";
+import { Profile } from "./Profile.js";
+import { CalendarIcon, ChatIcon, ProfileIcon } from "./icons.js";
 
-type Tab = "coach" | "checkin";
+type Tab = "calendar" | "chat" | "profile";
+
+const TABS: Array<{ id: Tab; label: string; Icon: ComponentType<{ size?: number }> }> = [
+  { id: "calendar", label: "Calendar", Icon: CalendarIcon },
+  { id: "chat", label: "Chat", Icon: ChatIcon },
+  { id: "profile", label: "Profile", Icon: ProfileIcon },
+];
 
 export function App() {
-  const [tab, setTab] = useState<Tab>("coach");
+  const [tab, setTab] = useState<Tab>("chat");
 
   return (
-    <div className="app">
-      <header className="header">
-        <h1>
-          Ready<span className="accent">or</span>Rest
-        </h1>
-        <p className="tagline">
-          An AI endurance coach that reads your training data and tells you whether to train hard, go
-          easy, or rest — then plans your week.
-        </p>
-        <nav className="tabs">
-          <button className={tab === "coach" ? "tab on" : "tab"} onClick={() => setTab("coach")}>
-            Coach
-          </button>
-          <button className={tab === "checkin" ? "tab on" : "tab"} onClick={() => setTab("checkin")}>
-            Daily check-in
-          </button>
-        </nav>
-      </header>
+    <div className="shell">
+      <main className="shell-main">
+        {tab === "calendar" && <Calendar />}
+        {tab === "chat" && <Chat />}
+        {tab === "profile" && <Profile />}
+      </main>
 
-      <main>{tab === "coach" ? <Coach /> : <CheckIn />}</main>
-
-      <footer className="footer">
-        Original, independent build. Decision engine uses public sports-science methods (CTL/ATL/TSB,
-        ACWR, HRV-guided training); the coach is grounded by that engine via OpenRouter. Not affiliated
-        with any app. Guidance only — not medical advice.
-      </footer>
+      <nav className="bottom-nav" aria-label="Primary">
+        {TABS.map(({ id, label, Icon }) => (
+          <button
+            key={id}
+            className={`nav-btn ${tab === id ? "on" : ""}`}
+            aria-current={tab === id ? "page" : undefined}
+            onClick={() => setTab(id)}
+          >
+            <Icon />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }
