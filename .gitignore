@@ -28,3 +28,6 @@ Thumbs.db
 # Test / coverage
 coverage/
 .vitest/
+
+# Server runtime data (tokens, cached activities)
+apps/server/data/

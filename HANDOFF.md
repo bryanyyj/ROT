@@ -4,7 +4,14 @@ Read this first when resuming on another machine. It summarises what this projec
 what's built, and exactly how to pick up where we left off.
 
 **Repo:** https://github.com/bryanyyj/ROT · **Working branch:** `feat/rest-or-train-rebuild`
-**Last updated:** 2026-10-27.
+**Last updated:** 2026-10-28.
+
+> **PIVOT (2026-10-28):** the project is now an **AI endurance coach** — a backend (`apps/server`)
+> reads your real training data (Strava; Garmin deferred), the readiness engine grounds an **LLM via
+> OpenRouter**, and the React **Coach** tab chats + plans your week. The original deterministic
+> check-in is still there as the "Daily check-in" tab. To run the coach live you need
+> `apps/server/.env` with `OPENROUTER_API_KEY` (see `.env.example`). Details: ADR-006..009 in
+> `docs/04-architecture.md`.
 
 ---
 
@@ -61,9 +68,11 @@ RestOrTrain_REA_PRD.md # original brief (for reference)
 git clone https://github.com/bryanyyj/ROT.git
 cd ROT
 git checkout feat/rest-or-train-rebuild
-npm install            # needs Node >= 22.19
-npm test               # 22 tests
-npm run dev            # http://localhost:5173
+npm install                           # needs Node >= 22.19
+cp .env.example apps/server/.env      # add OPENROUTER_API_KEY (+ optional Strava)
+npm run dev --workspace apps/server   # API  http://localhost:8787
+npm run dev --workspace apps/web      # UI   http://localhost:5173
+npm test                              # 22 engine tests
 ```
 
 ## 6. Next steps (where to continue)

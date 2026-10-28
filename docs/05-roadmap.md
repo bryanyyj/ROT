@@ -1,6 +1,15 @@
 # 05 — Roadmap
 
-## Stage 1 — MVP (this iteration)
+> **Pivot (2026-10-28):** the product is an **AI chat coach** that reads real training data and plans
+> the week (see ADR-006). Stages below updated accordingly.
+
+## Stage 2b — AI coach (current) ✅ built, pending owner keys
+- Backend (`apps/server`) + React Coach tab. Engine grounds an LLM (via OpenRouter) that answers
+  questions and generates a weekly plan from the athlete's real activities.
+- Strava OAuth + sample data + file import; Garmin deferred (approval). Needs `OPENROUTER_API_KEY`
+  (and optional Strava app) in `apps/server/.env` to run live.
+
+## Stage 1 — MVP (done)
 **Scope:** pure decision engine + minimal React daily check-in → recommendation UI, local persistence.
 **Acceptance criteria:**
 - `recommend(input)` implements `02-behaviour-spec.md` exactly.

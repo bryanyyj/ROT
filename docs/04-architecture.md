@@ -46,6 +46,43 @@ debuggable.
 `DailyEntry` = check-in fields + optional session load for the day, keyed by ISO date. History arrays
 for the engine are derived by reading the last N entries from `localStorage`.
 
+## ADR-006 — Pivot to an AI chat coach (the product's actual shape)
+**Decision:** The product is not a standalone readiness calculator but an **AI coach** that reads the
+athlete's real training data and plans/adjusts their week conversationally (matching what RestOrTrain
+is). We add a **backend** (`apps/server`) and reposition the engine as a **grounding tool**.
+**Why:** the deterministic engine alone missed the essence (data ingestion + conversational planning).
+
+## ADR-007 — Backend with Express; LLM via OpenRouter
+**Decision:** `apps/server` (Express, TS, run with `tsx`) holds secrets, does OAuth, and calls the LLM
+through **OpenRouter** (OpenAI-compatible SDK, `OPENROUTER_MODEL` configurable incl. `:free` models).
+**Why:** OAuth client secrets and the LLM key must stay server-side; OpenRouter keeps the PRD's
+"free-first" option open and lets the model be swapped without code changes.
+
+## ADR-008 — Ground the LLM by context-injection, not fragile tool-calls
+**Decision:** The server computes readiness + CTL/ATL/TSB/ACWR + a recent-activity summary with the
+engine and **injects it into the system prompt**; the LLM reasons over that block.
+**Why:** reliable across all models (free ones vary at tool-calling), cheaper, and keeps advice grounded
+in real numbers instead of hallucinations. (`apps/server/src/coach.ts`.)
+
+## ADR-009 — Data sources: Strava first, Garmin deferred
+**Decision:** Strava OAuth (self-serve) is the first real source; sample data + file import make the app
+testable immediately; Garmin is structured but deferred (Developer Program approval is not instant;
+Intervals.icu is the practical shortcut). **Why:** fastest path to a working, legal data feed.
+Using the athlete's **own** data via official OAuth is fully legal.
+
+## Pivoted architecture
+
+```
+apps/server (Express + tsx)
+  src/strava.ts    # OAuth + activity sync         src/garmin.ts  # stub (approval pending)
+  src/coach.ts     # engine grounding + prompts     src/openrouter.ts # OpenAI-compatible client
+  src/store.ts     # tokens + activities (file)      src/index.ts   # /api/* routes
+        │ uses @rot/engine to compute readiness/load from real activities
+apps/web (React)
+  Coach tab: status + engine readiness + chat (streamed) + weekly plan
+  Check-in tab: manual wellness (also POSTed to the coach)
+```
+
 ## Testing strategy
 
 - **Unit tests:** each helper (CTL/ATL, ACWR, baseline/SWC, each sub-score) against hand-computed

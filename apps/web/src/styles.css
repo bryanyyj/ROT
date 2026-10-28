@@ -146,3 +146,58 @@ input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-colo
 .history-meta { color: var(--muted); }
 
 .footer { text-align: center; color: var(--muted); font-size: 0.78rem; margin-top: 40px; max-width: 60ch; margin-inline: auto; }
+
+/* ---- tabs ---- */
+.tabs { display: inline-flex; gap: 6px; margin-top: 20px; background: var(--bg-elev); border: 1px solid var(--line); border-radius: 999px; padding: 5px; }
+.tab { background: transparent; border: none; color: var(--muted); font-weight: 600; padding: 8px 20px; border-radius: 999px; cursor: pointer; font-size: 0.9rem; }
+.tab:hover { color: var(--text); }
+.tab.on { background: var(--accent); color: #04121f; }
+
+.muted { color: var(--muted); }
+.small { font-size: 0.82rem; }
+
+/* ---- coach ---- */
+.coach { display: flex; flex-direction: column; gap: 20px; }
+.coach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+@media (max-width: 820px) { .coach-grid { grid-template-columns: 1fr; } }
+
+.flash { border-radius: 10px; padding: 10px 14px; font-size: 0.88rem; }
+.flash.ok { background: rgba(34, 197, 94, 0.14); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
+.flash.err { background: rgba(244, 63, 94, 0.14); color: #fda4af; border: 1px solid rgba(244,63,94,0.3); }
+
+.statusbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 16px 20px; }
+.status-items { display: flex; flex-wrap: wrap; gap: 8px; flex: 1; }
+.status-chip { background: var(--bg-elev); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 0.8rem; color: var(--muted); }
+.status-chip.on { border-color: rgba(34,197,94,0.5); color: #86efac; }
+.status-chip.off { border-color: rgba(244,63,94,0.4); color: #fda4af; }
+.status-note { flex-basis: 100%; margin: 4px 0 0; font-size: 0.82rem; color: var(--muted); }
+.status-note code, .muted code { background: var(--bg-elev); padding: 1px 6px; border-radius: 6px; font-size: 0.85em; }
+.btn-sm { background: var(--accent); color: #04121f; border: none; border-radius: 9px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
+.btn-sm:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.readiness { border-top: 4px solid var(--line); }
+.readiness.tone-train-hard { border-top-color: var(--hard); }
+.readiness.tone-train-easy { border-top-color: var(--easy); }
+.readiness.tone-rest { border-top-color: var(--rest); }
+.readiness-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 14px; }
+.tone-train-hard .result-rec { color: var(--hard); }
+.tone-train-easy .result-rec { color: var(--easy); }
+.tone-rest .result-rec { color: var(--rest); }
+
+/* ---- chat ---- */
+.chat { display: flex; flex-direction: column; min-height: 420px; }
+.chat h3, .plan-head h3 { margin: 0 0 12px; font-size: 1.05rem; }
+.chat-log { flex: 1; overflow-y: auto; max-height: 420px; display: flex; flex-direction: column; gap: 14px; padding-right: 4px; }
+.msg { display: flex; flex-direction: column; gap: 3px; }
+.msg-role { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.msg-body { white-space: pre-wrap; line-height: 1.5; font-size: 0.92rem; }
+.msg.user .msg-body { background: var(--bg-elev); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; align-self: flex-start; }
+.msg.assistant .msg-body { color: var(--text); }
+.chat-input { display: flex; gap: 8px; margin-top: 14px; }
+.chat-input textarea { flex: 1; resize: vertical; min-height: 44px; max-height: 160px; background: var(--bg-elev); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 10px 12px; font-family: inherit; font-size: 0.92rem; }
+.chat-input textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+.chat-input .submit { width: auto; margin: 0; padding: 0 20px; }
+
+/* ---- plan ---- */
+.plan-head { display: flex; justify-content: space-between; align-items: center; }
+.plan-text { white-space: pre-wrap; font-family: inherit; font-size: 0.9rem; line-height: 1.55; margin: 0; background: var(--bg-elev); border: 1px solid var(--line); border-radius: 10px; padding: 14px; max-height: 420px; overflow-y: auto; }
