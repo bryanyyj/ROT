@@ -1,7 +1,9 @@
-# ROT — "Rest or Train" training-readiness app
+# ROT — "Rest or Train" AI endurance coach
 
-An **original** training-readiness app: given your recovery and training-load data, it recommends
-**train hard / go easy / rest** with a transparent, explainable readiness score.
+An **original** AI endurance coach: it reads your real training data (Strava, with Garmin deferred),
+works out whether to **train hard / go easy / rest** with a transparent readiness engine, and a chat
+coach (via OpenRouter) **plans and adapts your week** — grounded in that engine so advice isn't
+hallucinated.
 
 > **Clean-room / legal note.** This is an independent implementation built from *publicly documented
 > sports-science methods* (e.g. CTL/ATL/TSB, acute:chronic workload ratio, HRV-guided training,
@@ -10,27 +12,51 @@ An **original** training-readiness app: given your recovery and training-load da
 
 ## Status
 
-Early scaffold. Work proceeds in phases with owner checkpoints — see [`docs/`](docs/).
+**AI coach built.** Decision engine (`@rot/engine`, 22 tests) + Express backend (`apps/server`) that
+grounds an LLM via **OpenRouter** + React UI (`apps/web`) with a **Coach** tab (chat + weekly plan) and
+a **Daily check-in** tab. Runs on sample data out of the box; add keys for live LLM + Strava.
 
 ## Project layout
 
 ```
 packages/engine   # pure, testable decision engine (no UI, no I/O)
-apps/web          # minimal daily check-in -> recommendation web UI (added in Phase 4)
+apps/server       # Express API: Strava OAuth, engine grounding, OpenRouter chat/plan
+apps/web          # React UI: Coach (chat + plan) + Daily check-in
 docs/             # scope, research, behaviour spec, architecture, roadmap, validation
 references/       # public-source notes & citations
 ```
 
-## Develop
+## Run it
+
+Requires Node.js ≥ 22.19.
 
 ```bash
 npm install
-npm test          # run engine unit + golden tests
-npm run typecheck
-npm run dev        # launch the web app (once apps/web exists)
+cp .env.example apps/server/.env     # then add OPENROUTER_API_KEY (and optional Strava)
+npm run dev --workspace apps/server  # API on http://localhost:8787
+npm run dev --workspace apps/web     # UI  on http://localhost:5173
 ```
 
-Requires Node.js ≥ 22.19.
+- **Real data only — no demo data.** Until you connect a source the Calendar/Profile show a "connect
+  your training" prompt.
+- With a **Strava** app configured (Client ID/secret in `.env`): click *Connect Strava* to sync your
+  own rides/runs/swims; the engine and coach work from your real load and form.
+- With `OPENROUTER_API_KEY`: the **Coach** chats and generates a weekly plan (pick any model via
+  `OPENROUTER_MODEL`, incl. free `:free` slugs).
+- **Garmin:** no free official API (approval-gated partner program). Free route to Garmin data is
+  **Intervals.icu** (free API key, mirrors Garmin) — ask to have it wired in.
+
+```bash
+npm test            # engine unit + golden tests (22)
+npm run typecheck   # all workspaces
+```
+
+## Calibrate against your own data (legal)
+
+The engine's weights/thresholds are literature-grounded defaults, not any app's actual values. Record
+your **own** observed input→recommendation pairs from RestOrTrain in
+[`evidence/owner-observations.json`](evidence/owner-observations.json); `npm test` reports a match rate.
+See [`docs/00-scope.md`](docs/00-scope.md) for why this (and using your own Strava/Garmin data) is legal.
 
 ## License
 

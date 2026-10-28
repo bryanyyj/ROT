@@ -1,0 +1,22 @@
+{
+  "_note": "Black-box reference captured by the OWNER from his OWN RestOrTrain account (legal: own data, no decompilation). Each item records the inputs you saw that day and the recommendation RestOrTrain gave. Used only to calibrate/validate our independent engine. See docs/00-scope.md. Map RestOrTrain's wording to one of: TRAIN_HARD | TRAIN_EASY | REST.",
+  "_schema": {
+    "date": "YYYY-MM-DD",
+    "observed": "TRAIN_HARD | TRAIN_EASY | REST (what RestOrTrain told you)",
+    "input": {
+      "rmssd": "HRV rMSSD in ms (optional)",
+      "restingHr": "bpm (optional)",
+      "sleepHours": "number",
+      "sleepQuality": "1-5",
+      "soreness": "1-5",
+      "fatigue": "1-5",
+      "stress": "1-5",
+      "motivation": "1-5",
+      "sessionLoad": "TSS/TRIMP for that day (optional)"
+    },
+    "hrvHistory": "optional array of recent rMSSD (ms) values, oldest-first",
+    "rhrHistory": "optional array of recent resting-HR values, oldest-first",
+    "sessionLoads": "optional array of recent daily loads, oldest-first (most recent last)"
+  },
+  "observations": []
+}
