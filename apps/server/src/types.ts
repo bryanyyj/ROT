@@ -1,4 +1,4 @@
-export type DataSource = "strava" | "garmin" | "sample" | "import";
+export type DataSource = "strava" | "garmin" | "intervals" | "import" | "none";
 
 /** A single training activity, normalised across sources. */
 export interface Activity {

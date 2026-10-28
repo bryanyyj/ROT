@@ -1,5 +1,27 @@
 import { useEffect, useState } from "react";
-import { getWeek, type WeekData, type Intensity } from "./api.js";
+import { getWeek, getStatus, connectStrava, type WeekData, type Status, type Intensity } from "./api.js";
+
+export function ConnectData({ status }: { status: Status | null }) {
+  const configured = status?.strava.configured;
+  return (
+    <div className="card empty-connect">
+      <h2>Connect your training</h2>
+      <p className="muted">
+        This app uses your real activities — no demo data. Link Strava to sync your rides, runs and
+        swims, and the coach will plan from your actual load and form.
+      </p>
+      {configured ? (
+        <button className="btn-sm" onClick={connectStrava}>Connect Strava</button>
+      ) : (
+        <p className="chat-note">
+          Add <code>STRAVA_CLIENT_ID</code> and <code>STRAVA_CLIENT_SECRET</code> to{" "}
+          <code>apps/server/.env</code> (create an app at strava.com/settings/api, callback domain{" "}
+          <code>localhost</code>), then restart the API server.
+        </p>
+      )}
+    </div>
+  );
+}
 
 const INTENSITY_TONE: Record<Intensity, string> = {
   rest: "rest",
@@ -32,14 +54,25 @@ function relDay(dateIso: string): string {
 
 export function Calendar() {
   const [week, setWeek] = useState<WeekData | null>(null);
+  const [status, setStatus] = useState<Status | null>(null);
   const [err, setErr] = useState("");
 
   useEffect(() => {
     getWeek().then(setWeek).catch(() => setErr("Could not load your calendar. Is the coach server running?"));
+    getStatus().then(setStatus).catch(() => {});
   }, []);
 
   if (err) return <div className="view-pad"><div className="flash err">{err}</div></div>;
   if (!week) return <div className="view-pad"><p className="muted">Loading your calendar…</p></div>;
+
+  if (week.planned.length === 0 && week.past.length === 0) {
+    return (
+      <div className="view-scroll view-pad">
+        <header className="view-head"><h1>Calendar</h1></header>
+        <ConnectData status={status} />
+      </div>
+    );
+  }
 
   return (
     <div className="view-scroll view-pad">
@@ -72,7 +105,7 @@ export function Calendar() {
         })}
       </ol>
 
-      <h2 className="section-label">Completed</h2>
+      {week.past.length > 0 && <h2 className="section-label">Completed</h2>}
       <ol className="agenda">
         {week.past.map((c, i) => {
           const { dow, day } = fmt(c.date);

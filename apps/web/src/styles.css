@@ -187,6 +187,10 @@ body {
 .sess-rationale { color: var(--muted); font-size: 0.82rem; }
 .sess-rationale b { color: var(--text); }
 
+.empty-connect h2 { margin: 0 0 8px; font-size: 1.2rem; }
+.empty-connect p { margin: 0 0 16px; }
+.empty-connect .chat-note { margin-bottom: 0; }
+
 /* ---------- profile metrics ---------- */
 .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 @media (max-width: 400px) { .metric-grid { grid-template-columns: repeat(2, 1fr); } }

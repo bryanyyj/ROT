@@ -2,7 +2,8 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Activity, DataSource, Wellness } from "./types.js";
-import { sampleActivities, sampleWellness } from "./sampleData.js";
+
+const todayIso = () => new Date().toISOString().slice(0, 10);
 
 const here = dirname(fileURLToPath(import.meta.url));
 const FILE = resolve(here, "../data/store.json");
@@ -26,7 +27,7 @@ function load(): StoreData {
   try {
     return JSON.parse(readFileSync(FILE, "utf8")) as StoreData;
   } catch {
-    return { source: "sample", activities: [] };
+    return { source: "none", activities: [] };
   }
 }
 
@@ -40,14 +41,13 @@ function persist(): void {
 }
 
 export const store = {
-  /** Activities from the connected source, or sample data when nothing is connected. */
+  /** Activities from the connected source. Empty until a source is connected. */
   getActivities(): Activity[] {
-    if (data.source === "sample" || data.activities.length === 0) return sampleActivities();
     return data.activities;
   },
 
   getWellness(): Wellness {
-    return data.wellness ?? sampleWellness();
+    return data.wellness ?? { date: todayIso() };
   },
 
   setWellness(w: Wellness): void {
@@ -56,7 +56,7 @@ export const store = {
   },
 
   getSource(): DataSource {
-    return data.activities.length > 0 ? data.source : "sample";
+    return data.activities.length > 0 ? data.source : "none";
   },
 
   setActivities(activities: Activity[], source: DataSource): void {
@@ -75,7 +75,7 @@ export const store = {
   },
 
   reset(): void {
-    data = { source: "sample", activities: [] };
+    data = { source: "none", activities: [] };
     persist();
   },
 };

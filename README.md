@@ -37,11 +37,14 @@ npm run dev --workspace apps/server  # API on http://localhost:8787
 npm run dev --workspace apps/web     # UI  on http://localhost:5173
 ```
 
-- Without keys: the app loads with **sample training data**; the engine readiness works; chat/plan show
-  a "configure OpenRouter" notice.
+- **Real data only — no demo data.** Until you connect a source the Calendar/Profile show a "connect
+  your training" prompt.
+- With a **Strava** app configured (Client ID/secret in `.env`): click *Connect Strava* to sync your
+  own rides/runs/swims; the engine and coach work from your real load and form.
 - With `OPENROUTER_API_KEY`: the **Coach** chats and generates a weekly plan (pick any model via
   `OPENROUTER_MODEL`, incl. free `:free` slugs).
-- With a **Strava** app configured: click *Connect Strava* to use your own activities.
+- **Garmin:** no free official API (approval-gated partner program). Free route to Garmin data is
+  **Intervals.icu** (free API key, mirrors Garmin) — ask to have it wired in.
 
 ```bash
 npm test            # engine unit + golden tests (22)

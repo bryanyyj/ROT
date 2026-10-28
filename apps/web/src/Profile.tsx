@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getContext, getStatus, connectStrava, type CoachContext, type Status } from "./api.js";
 import { CheckIn } from "./CheckIn.js";
+import { ConnectData } from "./Calendar.js";
 
 const REC_LABEL: Record<string, string> = {
   TRAIN_HARD: "Train hard",
@@ -24,7 +25,8 @@ export function Profile() {
         <p className="muted small">Your training load and recovery at a glance.</p>
       </header>
 
-      {ctx && <ReadinessBlock ctx={ctx} />}
+      {status?.source === "none" && <ConnectData status={status} />}
+      {ctx && status?.source !== "none" && <ReadinessBlock ctx={ctx} />}
 
       <h2 className="section-label">Training load</h2>
       <div className="metric-grid">

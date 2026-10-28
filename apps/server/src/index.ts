@@ -52,8 +52,9 @@ app.get("/api/context", (_req, res) => {
 app.get("/api/week", (_req, res) => {
   const activities = store.getActivities();
   const ctx = buildContext(activities, store.getWellness());
+  const hasData = activities.length > 0;
   res.json({
-    planned: planWeek(ctx, activities),
+    planned: hasData ? planWeek(ctx, activities) : [],
     past: pastSessions(activities),
     readiness: ctx.readiness,
     source: store.getSource(),
