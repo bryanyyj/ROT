@@ -94,10 +94,10 @@ input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-colo
 .result-col { display: flex; flex-direction: column; gap: 24px; }
 .result.empty p { color: var(--muted); margin: 0; }
 
-.result { border-top: 4px solid var(--line); }
-.result.tone-train-hard { border-top-color: var(--hard); }
-.result.tone-train-easy { border-top-color: var(--easy); }
-.result.tone-rest { border-top-color: var(--rest); }
+.result { box-shadow: inset 0 4px 0 var(--line), var(--shadow); }
+.result.tone-train-hard { box-shadow: inset 0 4px 0 var(--hard), var(--shadow); }
+.result.tone-train-easy { box-shadow: inset 0 4px 0 var(--easy), var(--shadow); }
+.result.tone-rest { box-shadow: inset 0 4px 0 var(--rest), var(--shadow); }
 
 .result-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
 .result-kicker { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; }
@@ -175,10 +175,10 @@ input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-colo
 .btn-sm { background: var(--accent); color: #04121f; border: none; border-radius: 9px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
 .btn-sm:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.readiness { border-top: 4px solid var(--line); }
-.readiness.tone-train-hard { border-top-color: var(--hard); }
-.readiness.tone-train-easy { border-top-color: var(--easy); }
-.readiness.tone-rest { border-top-color: var(--rest); }
+.readiness { box-shadow: inset 0 4px 0 var(--line), var(--shadow); }
+.readiness.tone-train-hard { box-shadow: inset 0 4px 0 var(--hard), var(--shadow); }
+.readiness.tone-train-easy { box-shadow: inset 0 4px 0 var(--easy), var(--shadow); }
+.readiness.tone-rest { box-shadow: inset 0 4px 0 var(--rest), var(--shadow); }
 .readiness-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 14px; }
 .tone-train-hard .result-rec { color: var(--hard); }
 .tone-train-easy .result-rec { color: var(--easy); }
