@@ -1,4 +1,7 @@
-import { useState, type ComponentType } from "react";
+import { useCallback, useState, type ComponentType } from "react";
+import { useChatSession } from "./chatSession.js";
+import { ReviewContext } from "./reviewContext.js";
+import type { WorkoutAttachment } from "./api.js";
 import { Chat } from "./Chat.js";
 import { Calendar } from "./Calendar.js";
 import { Profile } from "./Profile.js";
@@ -14,12 +17,18 @@ const TABS: Array<{ id: Tab; label: string; Icon: ComponentType<{ size?: number 
 
 export function App() {
   const [tab, setTab] = useState<Tab>("chat");
+  const chat = useChatSession();
+  const { review } = chat;
+  // Reviews always happen in the chat, so jump there before the answer streams in.
+  const startReview = useCallback((workout: WorkoutAttachment) => { setTab("chat"); void review(workout); }, [review]);
 
   return (
     <div className="shell">
       <main className="shell-main">
-        {tab === "calendar" && <Calendar />}
-        {tab === "chat" && <Chat />}
+        <ReviewContext.Provider value={startReview}>
+          {tab === "calendar" && <Calendar />}
+        </ReviewContext.Provider>
+        {tab === "chat" && <Chat messages={chat.messages} busy={chat.busy} send={chat.send} />}
         {tab === "profile" && <Profile />}
       </main>
 

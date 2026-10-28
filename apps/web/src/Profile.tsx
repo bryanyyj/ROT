@@ -1,22 +1,37 @@
 import { useEffect, useState } from "react";
-import { getContext, getStatus, connectStrava, type CoachContext, type Status } from "./api.js";
-import { CheckIn } from "./CheckIn.js";
+import { getContext, getFormHistory, getStatus, connectStrava, syncStrava, type CoachContext, type FormPoint, type Status } from "./api.js";
 import { ConnectData } from "./Calendar.js";
-
-const REC_LABEL: Record<string, string> = {
-  TRAIN_HARD: "Train hard",
-  TRAIN_EASY: "Go easy",
-  REST: "Rest",
-};
+import { TrainingWeek } from "./TrainingWeek.js";
+import { AthleteCard } from "./AthleteCard.js";
+import { TrainingStatusCard, TrainingStatusDetail } from "./TrainingStatus.js";
 
 export function Profile() {
   const [ctx, setCtx] = useState<CoachContext | null>(null);
   const [status, setStatus] = useState<Status | null>(null);
+  const [form, setForm] = useState<FormPoint[] | null>(null);
+  const [detail, setDetail] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState("");
 
   useEffect(() => {
     getContext().then(setCtx).catch(() => {});
     getStatus().then(setStatus).catch(() => {});
+    getFormHistory().then(setForm).catch(() => setForm([]));
   }, []);
+
+  async function sync() {
+    setSyncing(true); setSyncMsg("");
+    try {
+      const count = await syncStrava();
+      setSyncMsg(`Synced ${count} activities from the last year.`);
+      getContext().then(setCtx).catch(() => {});
+      getStatus().then(setStatus).catch(() => {});
+      getFormHistory().then(setForm).catch(() => {});
+    } catch (e) { setSyncMsg(e instanceof Error ? e.message : "Sync failed."); }
+    finally { setSyncing(false); }
+  }
+
+  if (detail) return <div className="view-scroll view-pad"><TrainingStatusDetail points={form ?? []} onBack={() => setDetail(false)} /></div>;
 
   return (
     <div className="view-scroll view-pad">
@@ -26,13 +41,11 @@ export function Profile() {
       </header>
 
       {status?.source === "none" && <ConnectData status={status} />}
-      {ctx && status?.source !== "none" && <ReadinessBlock ctx={ctx} />}
+      <AthleteCard />
+      {ctx && status?.source !== "none" && <StatusAndFitness ctx={ctx} form={form} onOpen={() => setDetail(true)} />}
 
       <h2 className="section-label">Training load</h2>
       <div className="metric-grid">
-        <Metric label="Fitness" sub="CTL" value={ctx ? ctx.readiness.metrics.ctl.toFixed(0) : "—"} />
-        <Metric label="Fatigue" sub="ATL" value={ctx ? ctx.readiness.metrics.atl.toFixed(0) : "—"} />
-        <Metric label="Form" sub="TSB" value={ctx ? ctx.readiness.metrics.tsb.toFixed(0) : "—"} signed />
         <Metric
           label="Load ratio"
           sub="ACWR"
@@ -41,6 +54,8 @@ export function Profile() {
         <Metric label="7-day load" sub="acute" value={ctx ? String(ctx.weekLoad) : "—"} />
         <Metric label="Activities" sub="loaded" value={ctx ? String(ctx.totalActivities) : "—"} />
       </div>
+
+      <TrainingWeek />
 
       <h2 className="section-label">Data &amp; connections</h2>
       <div className="card conn">
@@ -55,34 +70,32 @@ export function Profile() {
           value={status ? (status.strava.connected ? "connected" : status.strava.configured ? "ready to connect" : "not set up") : "…"}
           ok={status?.strava.connected}
         />
+        {status?.strava.connected && (
+          <>
+            <button className="btn-sm" onClick={sync} disabled={syncing}>{syncing ? "Syncing…" : "Sync Strava now"}</button>
+            {syncMsg && <p className="muted small" role="status">{syncMsg}</p>}
+          </>
+        )}
         {status?.strava.configured && !status.strava.connected && (
           <button className="btn-sm" onClick={connectStrava}>Connect Strava</button>
         )}
         <Row label="Garmin" value="needs developer approval" />
       </div>
-
-      <h2 className="section-label">Daily check-in</h2>
-      <CheckIn />
     </div>
   );
 }
 
-function ReadinessBlock({ ctx }: { ctx: CoachContext }) {
-  const r = ctx.readiness;
-  const tone = r.recommendation.toLowerCase().replace("_", "-");
+/** Training status (chart preview) and fitness, side by side at half width each. */
+function StatusAndFitness({ ctx, form, onOpen }: { ctx: CoachContext; form: FormPoint[] | null; onOpen: () => void }) {
+  const m = ctx.readiness.metrics;
   return (
-    <div className={`card readiness tone-${tone}`}>
-      <div className="readiness-head">
-        <div>
-          <span className="result-kicker">Today</span>
-          <h2 className="result-rec">{REC_LABEL[r.recommendation]}</h2>
-        </div>
-        <div className="score-ring">
-          <span className="score-num">{r.readinessScore}</span>
-          <span className="score-unit">/100</span>
-        </div>
-      </div>
-      <ul className="drivers">{r.drivers.map((d, i) => <li key={i}>{d}</li>)}</ul>
+    <div className="status-pair">
+      <TrainingStatusCard points={form} onOpen={onOpen} />
+      <section className="card status-card" aria-labelledby="fitness-title">
+        <h2 id="fitness-title" className="result-kicker">Fitness</h2>
+        <p className="status-value">{m.ctl.toFixed(0)}</p>
+        <p className="status-sub">Fatigue <b>{m.atl.toFixed(0)}</b> · Form <b className={m.tsb < 0 ? "neg" : ""}>{m.tsb.toFixed(0)}</b></p>
+      </section>
     </div>
   );
 }

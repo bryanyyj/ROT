@@ -1,9 +1,10 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { Activity, DataSource, Wellness } from "./types.js";
+import type { Activity, AthleteProfile, DataSource, PlannedSession, Wellness, WorkoutProfile, TrainingSchedule } from "./types.js";
+import { todayInZone } from "./dates.js";
 
-const todayIso = () => new Date().toISOString().slice(0, 10);
+const todayIso = () => todayInZone(data.trainingSchedule?.timeZone);
 
 const here = dirname(fileURLToPath(import.meta.url));
 const FILE = resolve(here, "../data/store.json");
@@ -19,6 +20,10 @@ interface StoreData {
   strava?: StravaTokens;
   activities: Activity[];
   wellness?: Wellness;
+  trainingSchedule?: TrainingSchedule;
+  aiPlan?: PlannedSession[];
+  athlete?: AthleteProfile;
+  stravaAthlete?: AthleteProfile;
 }
 
 let data: StoreData = load();
@@ -41,6 +46,44 @@ function persist(): void {
 }
 
 export const store = {
+  getTrainingSchedule(): TrainingSchedule {
+    return data.trainingSchedule ?? { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, days: Array.from({ length: 7 }, () => null) };
+  },
+
+  setTrainingSchedule(schedule: TrainingSchedule): void {
+    const previous = data.trainingSchedule;
+    data.trainingSchedule = schedule;
+    try {
+      mkdirSync(dirname(FILE), { recursive: true });
+      writeFileSync(FILE, JSON.stringify(data, null, 2));
+    } catch (error) {
+      data.trainingSchedule = previous;
+      throw error; // Do not report a persistent preference as saved if writing failed.
+    }
+  },
+  getAthlete(): { manual: AthleteProfile; synced: AthleteProfile } {
+    return { manual: data.athlete ?? {}, synced: data.stravaAthlete ?? {} };
+  },
+
+  setAthlete(profile: AthleteProfile): void {
+    data.athlete = profile;
+    persist();
+  },
+
+  setStravaAthlete(profile: AthleteProfile): void {
+    data.stravaAthlete = profile;
+    persist();
+  },
+
+  getAiPlan(): PlannedSession[] {
+    return data.aiPlan ?? [];
+  },
+
+  setAiPlan(sessions: PlannedSession[]): void {
+    data.aiPlan = sessions;
+    persist();
+  },
+
   /** Activities from the connected source. Empty until a source is connected. */
   getActivities(): Activity[] {
     return data.activities;
@@ -48,6 +91,14 @@ export const store = {
 
   getWellness(): Wellness {
     return data.wellness ?? { date: todayIso() };
+  },
+
+  setWorkoutProfile(id: string, profile: WorkoutProfile): void {
+    const activity = data.activities.find((a) => a.id === id);
+    if (activity) {
+      activity.profile = profile;
+      persist();
+    }
   },
 
   setWellness(w: Wellness): void {

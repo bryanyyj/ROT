@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { streamChat, getStatus, type ChatMessage } from "./api.js";
+import { getStatus, type ChatMessage } from "./api.js";
+import { ReviewReply, WorkoutChip } from "./WorkoutChat.js";
 import { SendIcon } from "./icons.js";
+import { CoachText } from "./CoachText.js";
 
 const SUGGESTIONS = [
   "Should I train hard today?",
@@ -9,10 +11,8 @@ const SUGGESTIONS = [
   "How's my form looking?",
 ];
 
-export function Chat() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+export function Chat({ messages, busy, send }: { messages: ChatMessage[]; busy: boolean; send: (text: string) => Promise<void> }) {
   const [input, setInput] = useState("");
-  const [busy, setBusy] = useState(false);
   const [llmReady, setLlmReady] = useState<boolean | null>(null);
   const [model, setModel] = useState("");
   const [free, setFree] = useState(false);
@@ -40,35 +40,11 @@ export function Chat() {
     ta.style.height = `${Math.min(ta.scrollHeight, 160)}px`;
   }
 
-  async function send(text: string) {
-    const content = text.trim();
-    if (!content || busy) return;
-    const history: ChatMessage[] = [...messages, { role: "user", content }];
-    setMessages([...history, { role: "assistant", content: "" }]);
+  function submit(text: string) {
+    if (!text.trim() || busy) return;
     setInput("");
     requestAnimationFrame(autoGrow);
-    setBusy(true);
-    try {
-      await streamChat(history, (delta) => {
-        setMessages((prev) => {
-          const copy = [...prev];
-          const last = copy[copy.length - 1]!;
-          copy[copy.length - 1] = { ...last, content: last.content + delta };
-          return copy;
-        });
-      });
-    } catch (e) {
-      setMessages((prev) => {
-        const copy = [...prev];
-        copy[copy.length - 1] = {
-          role: "assistant",
-          content: `I couldn't reach the coaching model. ${e instanceof Error ? e.message : ""}`.trim(),
-        };
-        return copy;
-      });
-    } finally {
-      setBusy(false);
-    }
+    void send(text);
   }
 
   const empty = messages.length === 0;
@@ -84,7 +60,7 @@ export function Chat() {
             </p>
             <div className="suggestions">
               {SUGGESTIONS.map((s) => (
-                <button key={s} className="suggestion" disabled={llmReady === false} onClick={() => send(s)}>
+                <button key={s} className="suggestion" disabled={llmReady === false} onClick={() => submit(s)}>
                   {s}
                 </button>
               ))}
@@ -99,9 +75,15 @@ export function Chat() {
           <div className="chat-thread">
             {messages.map((m, i) => (
               <div key={i} className={`bubble-row ${m.role}`}>
-                <div className={`bubble ${m.role}`}>
-                  {m.content || <span className="typing"><i /><i /><i /></span>}
-                </div>
+                {m.role === "user" && m.workout ? (
+                  <div className="review-request"><WorkoutChip workout={m.workout} /><div className="bubble user">{m.content}</div></div>
+                ) : (
+                  <div className={`bubble ${m.role}`}>
+                    {!m.content ? <span className="typing"><i /><i /><i /></span>
+                      : m.review && m.workout ? <ReviewReply content={m.content} workout={m.workout} />
+                      : m.role === "assistant" ? <CoachText>{m.content}</CoachText> : m.content}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -123,7 +105,7 @@ export function Chat() {
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
-                send(input);
+                submit(input);
               }
             }}
           />
@@ -131,7 +113,7 @@ export function Chat() {
             className="send"
             aria-label="Send message"
             disabled={llmReady === false || busy || input.trim() === ""}
-            onClick={() => send(input)}
+            onClick={() => submit(input)}
           >
             <SendIcon />
           </button>

@@ -58,3 +58,32 @@ export function SendIcon({ size = 20 }: IconProps) {
     </svg>
   );
 }
+
+export function SwimIcon({ size = 22 }: IconProps) {
+  return (
+    <svg {...base(size)} aria-hidden="true">
+      <circle cx="16" cy="6.5" r="1.8" />
+      <path d="M4 12.5l5-3.2 4 2.2 2.5-2" />
+      <path d="M3 16c1.5 0 1.5 1 3 1s1.5-1 3-1 1.5 1 3 1 1.5-1 3-1 1.5 1 3 1 1.5-1 3-1M3 20c1.5 0 1.5 1 3 1s1.5-1 3-1 1.5 1 3 1 1.5-1 3-1 1.5 1 3 1 1.5-1 3-1" />
+    </svg>
+  );
+}
+
+export function RideIcon({ size = 22 }: IconProps) {
+  return (
+    <svg {...base(size)} aria-hidden="true">
+      <circle cx="6" cy="16" r="3.5" />
+      <circle cx="18" cy="16" r="3.5" />
+      <path d="M6 16l4-8h5l3 8M10 8L8.5 6H7M12.5 12.5H9.5" />
+    </svg>
+  );
+}
+
+export function RunIcon({ size = 22 }: IconProps) {
+  return (
+    <svg {...base(size)} aria-hidden="true">
+      <circle cx="14.5" cy="5" r="1.8" />
+      <path d="M12 9l-3 3 3 2.5-1.5 5M12 9l3.5 1.5 2.5 3M9 12l-3.5.5" />
+    </svg>
+  );
+}
