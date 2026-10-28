@@ -42,6 +42,14 @@ export function ProfileIcon({ size = 22 }: IconProps) {
   );
 }
 
+export function ChevronIcon({ size = 18 }: IconProps) {
+  return (
+    <svg {...base(size)} aria-hidden="true">
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
 export function SendIcon({ size = 20 }: IconProps) {
   return (
     <svg {...base(size)} aria-hidden="true">
